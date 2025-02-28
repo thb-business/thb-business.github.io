@@ -18,89 +18,74 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            color: #d48806;
-        }
-        .prayer-times {
-            text-align: left;
-            padding: 10px;
-        }
-        .prayer {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .iftar-countdown {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #d48806;
-        }
+        h1 { color: #d48806; }
+        .prayer-times { text-align: left; padding: 10px; }
+        .prayer { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd; }
+        .countdown { margin-top: 20px; font-size: 18px; color: #d48806; }
+        .preview { font-size: 14px; color: #666; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌙 Ramadan Kareem! 🌙</h1>
+        <h1 id="header"></h1>
         <h2 id="ramadan-day"></h2>
         <div class="prayer-times" id="prayer-times"></div>
-        <div class="iftar-countdown" id="iftar-countdown"></div>
+        <div class="countdown" id="countdown"></div>
+        <div class="preview">
+            <p><strong>Yesterday:</strong> <span id="yesterday-preview"></span></p>
+            <p><strong>Tomorrow:</strong> <span id="tomorrow-preview"></span></p>
+        </div>
     </div>
 
     <script>
-        // 📅 Ramadan Timings Data
         const ramadanTimings = [
-            { day: "Ramadan 01", date: "2025-03-01", fajr: "5:15 AM", sunrise: "6:38 AM", dhuhr: "12:34 PM", asr: "3:53 PM", maghrib: "6:24 PM", isha: "7:38 PM" },
-            { day: "Ramadan 02", date: "2025-03-02", fajr: "5:14 AM", sunrise: "6:37 AM", dhuhr: "12:34 PM", asr: "3:53 PM", maghrib: "6:25 PM", isha: "7:38 PM" },
-            { day: "Ramadan 03", date: "2025-03-03", fajr: "5:13 AM", sunrise: "6:36 AM", dhuhr: "12:34 PM", asr: "3:53 PM", maghrib: "6:25 PM", isha: "7:39 PM" },
-            { day: "Ramadan 04", date: "2025-03-04", fajr: "5:12 AM", sunrise: "6:35 AM", dhuhr: "12:33 PM", asr: "3:53 PM", maghrib: "6:26 PM", isha: "7:39 PM" },
-            { day: "Ramadan 05", date: "2025-03-05", fajr: "5:11 AM", sunrise: "6:34 AM", dhuhr: "12:33 PM", asr: "3:53 PM", maghrib: "6:26 PM", isha: "7:40 PM" },
-            // Add the remaining days...
+            { day: "Ramadan 01", date: "2025-03-01", fajr: "5:15 AM", maghrib: "6:24 PM" },
+            { day: "Ramadan 02", date: "2025-03-02", fajr: "5:14 AM", maghrib: "6:25 PM" },
+            { day: "Ramadan 03", date: "2025-03-03", fajr: "5:13 AM", maghrib: "6:25 PM" },
+            { day: "Ramadan 04", date: "2025-03-04", fajr: "5:12 AM", maghrib: "6:26 PM" },
+            { day: "Ramadan 05", date: "2025-03-05", fajr: "5:11 AM", maghrib: "6:26 PM" },
+            { day: "Ramadan 06", date: "2025-03-06", fajr: "5:10 AM", maghrib: "6:27 PM" },
+            { day: "Ramadan 07", date: "2025-03-07", fajr: "5:09 AM", maghrib: "6:27 PM" },
+            { day: "Ramadan 08", date: "2025-03-08", fajr: "5:08 AM", maghrib: "6:28 PM" },
+            { day: "Ramadan 09", date: "2025-03-09", fajr: "5:07 AM", maghrib: "6:28 PM" },
+            { day: "Ramadan 10", date: "2025-03-10", fajr: "5:06 AM", maghrib: "6:29 PM" },
+            { day: "Ramadan 11", date: "2025-03-11", fajr: "5:05 AM", maghrib: "6:29 PM" },
+            { day: "Ramadan 12", date: "2025-03-12", fajr: "5:04 AM", maghrib: "6:30 PM" },
+            { day: "Ramadan 13", date: "2025-03-13", fajr: "5:03 AM", maghrib: "6:30 PM" },
+            { day: "Ramadan 14", date: "2025-03-14", fajr: "5:02 AM", maghrib: "6:31 PM" },
+            { day: "Ramadan 15", date: "2025-03-15", fajr: "5:01 AM", maghrib: "6:31 PM" },
+            { day: "Ramadan 16", date: "2025-03-16", fajr: "5:00 AM", maghrib: "6:31 PM" },
+            { day: "Ramadan 17", date: "2025-03-17", fajr: "4:59 AM", maghrib: "6:32 PM" },
+            { day: "Ramadan 18", date: "2025-03-18", fajr: "4:58 AM", maghrib: "6:32 PM" },
+            { day: "Ramadan 19", date: "2025-03-19", fajr: "4:57 AM", maghrib: "6:33 PM" },
+            { day: "Ramadan 20", date: "2025-03-20", fajr: "4:56 AM", maghrib: "6:33 PM" },
+            { day: "Ramadan 21", date: "2025-03-21", fajr: "4:55 AM", maghrib: "6:34 PM" },
+            { day: "Ramadan 22", date: "2025-03-22", fajr: "4:54 AM", maghrib: "6:34 PM" },
+            { day: "Ramadan 23", date: "2025-03-23", fajr: "4:52 AM", maghrib: "6:35 PM" },
+            { day: "Ramadan 24", date: "2025-03-24", fajr: "4:51 AM", maghrib: "6:35 PM" },
+            { day: "Ramadan 25", date: "2025-03-25", fajr: "4:50 AM", maghrib: "6:35 PM" },
+            { day: "Ramadan 26", date: "2025-03-26", fajr: "4:49 AM", maghrib: "6:36 PM" },
+            { day: "Ramadan 27", date: "2025-03-27", fajr: "4:48 AM", maghrib: "6:36 PM" },
+            { day: "Ramadan 28", date: "2025-03-28", fajr: "4:47 AM", maghrib: "6:37 PM" },
+            { day: "Ramadan 29", date: "2025-03-29", fajr: "4:46 AM", maghrib: "6:37 PM" },
+            { day: "Ramadan 30", date: "2025-03-30", fajr: "4:45 AM", maghrib: "6:38 PM" }
         ];
 
+        const today = new Date();
+        const todayDate = today.toISOString().split('T')[0];
+
         function updatePrayerTimes() {
-            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD
-            const todayTimings = ramadanTimings.find(day => day.date === today);
-
-            if (todayTimings) {
+            const todayIndex = ramadanTimings.findIndex(day => day.date === todayDate);
+            if (todayIndex !== -1) {
+                const todayTimings = ramadanTimings[todayIndex];
                 document.getElementById("ramadan-day").innerText = todayTimings.day;
-
                 document.getElementById("prayer-times").innerHTML = `
                     <div class="prayer"><span>Fajr</span><span>${todayTimings.fajr}</span></div>
-                    <div class="prayer"><span>Sunrise</span><span>${todayTimings.sunrise}</span></div>
-                    <div class="prayer"><span>Dhuhr</span><span>${todayTimings.dhuhr}</span></div>
-                    <div class="prayer"><span>Asr</span><span>${todayTimings.asr}</span></div>
                     <div class="prayer"><span>Maghrib (Iftar)</span><span>${todayTimings.maghrib}</span></div>
-                    <div class="prayer"><span>Isha</span><span>${todayTimings.isha}</span></div>
                 `;
-
-                updateIftarCountdown(todayTimings.maghrib);
             } else {
-                document.getElementById("ramadan-day").innerText = "Ramadan is Over! 🌙";
-                document.getElementById("prayer-times").innerHTML = "";
-                document.getElementById("iftar-countdown").innerText = "";
+                document.getElementById("header").innerText = "🎉 Eid Mubarak!";
             }
-        }
-
-        function updateIftarCountdown(iftarTime) {
-            const now = new Date();
-            const [hours, minutes] = iftarTime.split(/[:\s]/).slice(0, 2).map(Number);
-            const isPM = iftarTime.includes("PM");
-            const iftarDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), isPM ? hours + 12 : hours, minutes, 0);
-
-            function updateCountdown() {
-                const diff = iftarDate - new Date();
-                if (diff <= 0) {
-                    document.getElementById("iftar-countdown").innerText = "Iftar time! 🍽️";
-                    return;
-                }
-                const h = Math.floor(diff / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                document.getElementById("iftar-countdown").innerText = `Iftar in: ${h}h ${m}m ${s}s`;
-            }
-
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
         }
 
         updatePrayerTimes();
