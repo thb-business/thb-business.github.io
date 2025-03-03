@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramadan Timings - Family Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f7f3e9;
+        }
+        .container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 { color: #d48806; }
+        .prayer-times { text-align: left; padding: 10px; }
+        .prayer { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd; }
+        .countdown { margin-top: 20px; font-size: 18px; color: #d48806; }
+        .preview { font-size: 14px; color: #666; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="header"></h1>
+        <h2 id="ramadan-day"></h2>
+        <div class="prayer-times" id="prayer-times"></div>
+        <div class="countdown" id="countdown"></div>
+        <div class="preview">
+            <p><strong>Yesterday:</strong> <span id="yesterday-preview"></span></p>
+            <p><strong>Tomorrow:</strong> <span id="tomorrow-preview"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const ramadanTimings = [
+            { day: "Ramadan 01", date: "2025-03-01", imsak: "5:15 AM", maghrib: "6:24 PM" },
+            { day: "Ramadan 02", date: "2025-03-02", imsak: "5:14 AM", maghrib: "6:25 PM" },
+            { day: "Ramadan 03", date: "2025-03-03", imsak: "5:13 AM", maghrib: "6:25 PM" },
+            { day: "Ramadan 04", date: "2025-03-04", imsak: "5:12 AM", maghrib: "6:26 PM" },
+            { day: "Ramadan 05", date: "2025-03-05", imsak: "5:11 AM", maghrib: "6:26 PM" },
+            { day: "Ramadan 06", date: "2025-03-06", imsak: "5:10 AM", maghrib: "6:27 PM" },
+            { day: "Ramadan 07", date: "2025-03-07", imsak: "5:09 AM", maghrib: "6:27 PM" },
+            { day: "Ramadan 08", date: "2025-03-08", imsak: "5:08 AM", maghrib: "6:28 PM" },
+            { day: "Ramadan 09", date: "2025-03-09", imsak: "5:07 AM", maghrib: "6:28 PM" },
+            { day: "Ramadan 10", date: "2025-03-10", imsak: "5:06 AM", maghrib: "6:29 PM" },
+            { day: "Ramadan 11", date: "2025-03-11", imsak: "5:05 AM", maghrib: "6:29 PM" },
+            { day: "Ramadan 12", date: "2025-03-12", imsak: "5:04 AM", maghrib: "6:30 PM" },
+            { day: "Ramadan 13", date: "2025-03-13", imsak: "5:03 AM", maghrib: "6:30 PM" },
+            { day: "Ramadan 14", date: "2025-03-14", imsak: "5:02 AM", maghrib: "6:31 PM" },
+            { day: "Ramadan 15", date: "2025-03-15", imsak: "5:01 AM", maghrib: "6:31 PM" },
+            { day: "Ramadan 16", date: "2025-03-16", imsak: "5:00 AM", maghrib: "6:31 PM" },
+            { day: "Ramadan 17", date: "2025-03-17", imsak: "4:59 AM", maghrib: "6:32 PM" },
+            { day: "Ramadan 18", date: "2025-03-18", imsak: "4:58 AM", maghrib: "6:32 PM" },
+            { day: "Ramadan 19", date: "2025-03-19", imsak: "4:57 AM", maghrib: "6:33 PM" },
+            { day: "Ramadan 20", date: "2025-03-20", imsak: "4:56 AM", maghrib: "6:33 PM" },
+            { day: "Ramadan 21", date: "2025-03-21", imsak: "4:55 AM", maghrib: "6:34 PM" },
+            { day: "Ramadan 22", date: "2025-03-22", imsak: "4:54 AM", maghrib: "6:34 PM" },
+            { day: "Ramadan 23", date: "2025-03-23", imsak: "4:52 AM", maghrib: "6:35 PM" },
+            { day: "Ramadan 24", date: "2025-03-24", imsak: "4:51 AM", maghrib: "6:35 PM" },
+            { day: "Ramadan 25", date: "2025-03-25", imsak: "4:50 AM", maghrib: "6:35 PM" },
+            { day: "Ramadan 26", date: "2025-03-26", imsak: "4:49 AM", maghrib: "6:36 PM" },
+            { day: "Ramadan 27", date: "2025-03-27", imsak: "4:48 AM", maghrib: "6:36 PM" },
+            { day: "Ramadan 28", date: "2025-03-28", imsak: "4:47 AM", maghrib: "6:37 PM" },
+            { day: "Ramadan 29", date: "2025-03-29", imsak: "4:46 AM", maghrib: "6:37 PM" },
+            { day: "Ramadan 30", date: "2025-03-30", imsak: "4:45 AM", maghrib: "6:38 PM" }
+        ];
+
+        const today = new Date();
+        const todayDate = today.toISOString().split('T')[0];
+
+        function updatePrayerTimes() {
+            const todayIndex = ramadanTimings.findIndex(day => day.date === todayDate);
+            if (todayIndex !== -1) {
+                const todayTimings = ramadanTimings[todayIndex];
+                document.getElementById("ramadan-day").innerText = todayTimings.day;
+                document.getElementById("prayer-times").innerHTML = `
+                    <div class="prayer"><span>Imsak</span><span>${todayTimings.imsak}</span></div>
+                    <div class="prayer"><span>Maghrib (Iftar)</span><span>${todayTimings.maghrib}</span></div>
+                `;
+            } else {
+                document.getElementById("header").innerText = "🎉 Eid Mubarak!";
+            }
+        }
+
+        updatePrayerTimes();
+    </script>
+</body>
+</html>
