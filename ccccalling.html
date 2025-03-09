@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twilio Voice Call</title>
+</head>
+<body>
+    <h2>Make a Voice Call with Twilio</h2>
 
+    <!-- Input field to enter the phone number -->
+    <label for="phoneNumber">Enter Phone Number to Call:</label>
+    <input type="text" id="phoneNumber" placeholder="Enter phone number" />
+
+    <!-- Button to initiate the call -->
+    <button id="callButton">Make Call</button>
+
+    <script src="https://media.twiliocdn.com/sdk/js/voice/latest/twilio.min.js"></script>
+    <script>
+        // Button click event to initiate the call
+        document.getElementById('callButton').addEventListener('click', function() {
+            // Get the phone number from the input field
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+
+            // Check if the phone number is valid (basic validation)
+            if (!phoneNumber || !/^(\+?\d{1,3}[- ]?)?\d{10}$/.test(phoneNumber)) {
+                alert('Please enter a valid phone number.');
+                return;
+            }
+
+            // Step 1: Fetch the Access Token from your Pipedream endpoint
+            fetch('https://eozrcd07yn6p6sz.m.pipedream.net')  // Your Pipedream URL here
+                .then(response => response.json())
+                .then(data => {
+                    const token = data.token;  // Get the Access Token from the Pipedream response
+
+                    // Step 2: Initialize Twilio Voice Device with the token
+                    const device = new Twilio.Device(token);
+
+                    // Set up event listener when the device is ready
+                    device.on('ready', function() {
+                        console.log('Twilio Device is ready!');
+                    });
+
+                    // Step 3: Make the call to the phone number entered by the user
+                    device.connect({
+                        phoneNumber: phoneNumber
+                    });
+
+                    // Step 4: Handle incoming call events
+                    device.on('incoming', function(connection) {
+                        console.log('Incoming call from:', connection.parameters.From);
+                        connection.accept();
+                    });
+
+                })
+                .catch(error => {
+                    console.error('Error fetching token from Pipedream:', error);
+                });
+        });
+    </script>
+</body>
+</html>
