@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Owed Breakdown</title>
+  <style>
+   body {
+    font-family: Arial, sans-serif;
+    background-color: #eef2f3;
+    padding: 50px;
+    text-align: center;
+   }
+   
+   input,
+   select,
+   button {
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px;
+   }
+   
+   .result {
+    margin-top: 30px;
+    font-size: 18px;
+    font-weight: bold;
+   }
+   
+   .dropdown-section {
+    margin-top: 15px;
+   }
+   
+   #personAmount {
+    margin-top: 10px;
+    color: #006400;
+   }
+  </style>
+ </head>
+ <body>
+  
+  <h1>Check Who Owes You</h1>
+  
+  <input type="text" id="codeInput"
+   placeholder="Enter your code">
+  <button onclick="checkCode()">Check</button>
+  
+  <div class="result" id="resultArea"></div>
+  
+  <script>
+   const data = {
+     "2013": {
+       name: "Hammad",
+       exclude: null,
+       owed: {
+         Mama: 20,
+         Abbu: 46.75,
+         Hibbah: 0,
+         Hussain: 0
+       }
+     },
+     "2014": {
+       name: "Hibbah",
+       exclude: null,
+       owed: {
+         Mama: 189,
+         Abbu: 0,
+         Hussain: 0,
+         Hammad: 0
+       }
+     },
+     "2017": {
+       name: "Hussain",
+       exclude: null,
+       owed: {
+         Mama: 0,
+         Abbu: 0,
+         Hibbah: 0,
+         Hammad: 0
+       }
+     },
+     "1988": {
+       name: "Mama",
+       exclude: "Mama",
+       owed: {
+         Abbu: 0,
+         Hibbah: 0,
+         Hussain: 0,
+         Hammad: 0
+       }
+     },
+     "1982": {
+       name: "Abbu",
+       exclude: "Abbu",
+       owed: {
+         Mama: 0,
+         Hibbah: 0,
+         Hussain: 0,
+         Hammad: 0
+       }
+     }
+   };
+   
+   function checkCode() {
+     const code = document.getElementById("codeInput").value;
+     const resultArea = document.getElementById("resultArea");
+   
+     if (!data[code]) {
+       resultArea.innerHTML = `<p style="color:red;">Code not recognized.</p>`;
+       return;
+     }
+   
+     const person = data[code];
+     const totalOwed = Object.values(person.owed).reduce((sum, amt) => sum + amt, 0);
+   
+     const dropdownOptions = Object.entries(person.owed)
+       .filter(([name]) => name !== person.exclude)
+       .map(([name, amount]) => `<option value="${name}">${name}</option>`)
+       .join("");
+   
+     resultArea.innerHTML = `
+       <p>Welcome <strong>${person.name}</strong>!</p>
+       <p>Total Owed: <span style="color: green;">AED ${totalOwed.toFixed(2)}</span></p>
+   
+       <div class="dropdown-section">
+         <label for="personSelect">Select person:</label>
+         <select id="personSelect" onchange="showPersonAmount('${code}')">
+           <option value="" disabled selected>Select</option>
+           ${dropdownOptions}
+         </select>
+         <div id="personAmount"></div>
+       </div>
+     `;
+   }
+   
+   function showPersonAmount(code) {
+     const selected = document.getElementById("personSelect").value;
+     const amount = data[code].owed[selected];
+     document.getElementById("personAmount").textContent = `${selected} owes you: AED ${amount.toFixed(2)}`;
+   }
+  </script>
+  
+ </body>
+</html>
