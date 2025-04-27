@@ -23,12 +23,12 @@
     .dropdown-section {
       margin-top: 15px;
     }
-    #personAmount {
+    #personAmount, #reasonText, #oweOthers {
       margin-top: 10px;
       color: #006400;
+      font-size: 17px;
     }
     #reasonText {
-      margin-top: 5px;
       color: #333;
       font-style: italic;
       font-size: 16px;
@@ -50,8 +50,8 @@
       name: "Hammad",
       exclude: null,
       owed: {
-        Mama: { amount: 384, reason: "Paid for dinner on card at Golden Dragon." },
-        Abbu: { amount: 57, reason: "Paid by card at Golden Dragon." },
+        Mama: { amount: 384, reason: "Paid for dinner" },
+        Abbu: { amount: 57, reason: "Paid for Golden Dragon by card." },
         Hibbah: { amount: 0, reason: "Nothing owed" },
         Hussain: { amount: 0, reason: "Nothing owed" }
       }
@@ -60,8 +60,8 @@
       name: "Hibbah",
       exclude: null,
       owed: {
-        Mama: { amount: 0, reason: "Nothing owed" },
-        Abbu: { amount: 20, reason: "Battery Guy" },
+        Mama: { amount: 0, reason: "Amount cleared" },
+        Abbu: { amount: 20, reason: "Battery Guy for car" },
         Hussain: { amount: 0, reason: "Nothing owed" },
         Hammad: { amount: 0, reason: "Nothing owed" }
       }
@@ -99,7 +99,7 @@
   };
 
   function checkCode() {
-    const code = document.getElementById("codeInput").value;
+    const code = document.getElementById("codeInput").value.trim();
     const resultArea = document.getElementById("resultArea");
 
     if (!data[code]) {
@@ -108,7 +108,8 @@
     }
 
     const person = data[code];
-    const totalOwed = Object.values(person.owed)
+    const personName = person.name;
+    const totalOwedToYou = Object.values(person.owed)
       .reduce((sum, entry) => sum + entry.amount, 0);
 
     const dropdownOptions = Object.entries(person.owed)
@@ -116,9 +117,24 @@
       .map(([name, entry]) => `<option value="${name}">${name}</option>`)
       .join("");
 
+    // Checking what YOU OWE to others
+    let oweOthersHTML = "";
+    for (const [otherCode, otherPerson] of Object.entries(data)) {
+      if (otherCode === code) continue; // skip yourself
+
+      const owedFromYou = otherPerson.owed[personName];
+      if (owedFromYou && owedFromYou.amount > 0) {
+        oweOthersHTML += `<p><strong>${otherPerson.name}</strong> is owed by you: AED ${owedFromYou.amount.toFixed(2)}<br>
+        Reason: <em>${owedFromYou.reason}</em></p>`;
+      }
+    }
+    if (oweOthersHTML === "") {
+      oweOthersHTML = `<p>You don't owe anyone anything.</p>`;
+    }
+
     resultArea.innerHTML = `
       <p>Welcome <strong>${person.name}</strong>!</p>
-      <p>Total Owed: <span style="color: green;">AED ${totalOwed.toFixed(2)}</span></p>
+      <p>Total Owed to You: <span style="color: green;">AED ${totalOwedToYou.toFixed(2)}</span></p>
 
       <div class="dropdown-section">
         <label for="personSelect">Select person:</label>
@@ -128,6 +144,11 @@
         </select>
         <div id="personAmount"></div>
         <div id="reasonText"></div>
+      </div>
+
+      <div id="oweOthers">
+        <h3>What You Owe Others:</h3>
+        ${oweOthersHTML}
       </div>
     `;
   }
@@ -141,4 +162,4 @@
 </script>
 
 </body>
-</html>
+</html> 
