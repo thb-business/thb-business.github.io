@@ -10,156 +10,160 @@
       padding: 50px;
       text-align: center;
     }
+    
     input, select, button {
       padding: 10px;
       font-size: 16px;
       margin: 10px;
     }
+    
     .result {
       margin-top: 30px;
       font-size: 18px;
       font-weight: bold;
     }
+    
     .dropdown-section {
       margin-top: 15px;
     }
-    #personAmount, #reasonText, #oweOthers {
+    
+    #personAmount {
       margin-top: 10px;
       color: #006400;
-      font-size: 17px;
-    }
-    #reasonText {
-      color: #333;
-      font-style: italic;
-      font-size: 16px;
     }
   </style>
 </head>
 <body>
 
-<h1>Check Who Owes You</h1>
+  <h1>Check Who Owes You</h1>
+  
+  <input type="text" id="codeInput" placeholder="Enter your code">
+  <button onclick="checkCode()">Check</button>
+  
+  <div class="result" id="resultArea"></div>
+  
+  <script>
+    const data = {
+      "2013": {
+        name: "Hammad",
+        exclude: null,
+        owed: {
+          Mama: { amount: 384, reason: "Paid for dinner" },
+          Abbu: { amount: 57, reason: "dinner" },
+          Hibbah: { amount: 0, reason: "" },
+          Hussain: { amount: 0, reason: "" }
+        }
+      },
+      "2014": {
+        name: "Hibbah",
+        exclude: null,
+        owed: {
+          Mama: { amount: 0, reason: "Cleared" },
+          Abbu: { amount: 0, reason: "Cleared" },
+          Hussain: { amount: 0, reason: "" },
+          Hammad: { amount: 0, reason: "" }
+        }
+      },
+      "2017": {
+        name: "Hussain",
+        exclude: null,
+        owed: {
+          Mama: { amount: 0, reason: "" },
+          Abbu: { amount: 0, reason: "" },
+          Hibbah: { amount: 0, reason: "" },
+          Hammad: { amount: 0, reason: "" }
+        }
+      },
+      "1988": {
+        name: "Mama",
+        exclude: "Mama",
+        owed: {
+          Abbu: { amount: 0, reason: "" },
+          Hibbah: { amount: 0, reason: "" },
+          Hussain: { amount: 0, reason: "" },
+          Hammad: { amount: 0, reason: "" }
+        }
+      },
+      "1982": {
+        name: "Abbu",
+        exclude: "Abbu",
+        owed: {
+          Mama: { amount: 0, reason: "" },
+          Hibbah: { amount: 0, reason: "" },
+          Hussain: { amount: 0, reason: "" },
+          Hammad: { amount: 0, reason: "" }
+        }
+      }
+    };
 
-<input type="text" id="codeInput" placeholder="Enter your code">
-<button onclick="checkCode()">Check</button>
+    function checkCode() {
+      const code = document.getElementById("codeInput").value;
+      const resultArea = document.getElementById("resultArea");
 
-<div class="result" id="resultArea"></div>
+      if (!data[code]) {
+        resultArea.innerHTML = `<p style="color:red;">Code not recognized.</p>`;
+        return;
+      }
 
-<script>
-  const data = {
-    "2013": {
-      name: "Hammad",
-      exclude: null,
-      owed: {
-        Mama: { amount: 384, reason: "Paid for dinner" },
-        Abbu: { amount: 57, reason: "Paid for Golden Dragon by card." },
-        Hibbah: { amount: 0, reason: "Nothing owed" },
-        Hussain: { amount: 0, reason: "Nothing owed" }
+      const person = data[code];
+      const totalOwed = Object.values(person.owed).reduce((sum, info) => sum + info.amount, 0);
+
+      // Find people YOU owe (reverse lookup!)
+      const youOwe = [];
+      for (const [otherCode, otherPerson] of Object.entries(data)) {
+        if (otherCode === code) continue; // skip yourself
+
+        for (const [owedName, owedInfo] of Object.entries(otherPerson.owed)) {
+          if (owedName === person.name && owedInfo.amount > 0) {
+            youOwe.push({
+              from: otherPerson.name,
+              amount: owedInfo.amount,
+              reason: owedInfo.reason || "No reason provided"
+            });
+          }
+        }
       }
-    },
-    "2014": {
-      name: "Hibbah",
-      exclude: null,
-      owed: {
-        Mama: { amount: 0, reason: "Amount cleared" },
-        Abbu: { amount: 20, reason: "Battery Guy for car" },
-        Hussain: { amount: 0, reason: "Nothing owed" },
-        Hammad: { amount: 0, reason: "Nothing owed" }
+
+      const dropdownOptions = Object.entries(person.owed)
+        .filter(([name]) => name !== person.exclude)
+        .map(([name, info]) => `<option value="${name}">${name}</option>`)
+        .join("");
+
+      let youOweHTML = "";
+      if (youOwe.length > 0) {
+        youOweHTML = `<h3>People you owe:</h3>`;
+        youOwe.forEach(entry => {
+          youOweHTML += `<p>You owe <strong>${entry.from}</strong>: AED ${entry.amount.toFixed(2)} (${entry.reason})</p>`;
+        });
+      } else {
+        youOweHTML = `<p>You don't owe anyone anything.</p>`;
       }
-    },
-    "2017": {
-      name: "Hussain",
-      exclude: null,
-      owed: {
-        Mama: { amount: 0, reason: "Nothing owed" },
-        Abbu: { amount: 0, reason: "Nothing owed" },
-        Hibbah: { amount: 0, reason: "Nothing owed" },
-        Hammad: { amount: 0, reason: "Nothing owed" }
-      }
-    },
-    "1988": {
-      name: "Mama",
-      exclude: "Mama",
-      owed: {
-        Abbu: { amount: 0, reason: "Nothing owed" },
-        Hibbah: { amount: 0, reason: "Nothing owed" },
-        Hussain: { amount: 0, reason: "Nothing owed" },
-        Hammad: { amount: 0, reason: "Nothing owed" }
-      }
-    },
-    "1982": {
-      name: "Abbu",
-      exclude: "Abbu",
-      owed: {
-        Mama: { amount: 0, reason: "Nothing owed" },
-        Hibbah: { amount: 0, reason: "Nothing owed" },
-        Hussain: { amount: 0, reason: "Nothing owed" },
-        Hammad: { amount: 0, reason: "Nothing owed" }
-      }
+
+      resultArea.innerHTML = `
+        <p>Welcome <strong>${person.name}</strong>!</p>
+        <p>Total Owed To You: <span style="color: green;">AED ${totalOwed.toFixed(2)}</span></p>
+
+        <div class="dropdown-section">
+          <label for="personSelect">Select person:</label>
+          <select id="personSelect" onchange="showPersonAmount('${code}')">
+            <option value="" disabled selected>Select</option>
+            ${dropdownOptions}
+          </select>
+          <div id="personAmount"></div>
+        </div>
+
+        <div class="oweSection" style="margin-top:30px;">${youOweHTML}</div>
+      `;
     }
-  };
 
-  function checkCode() {
-    const code = document.getElementById("codeInput").value.trim();
-    const resultArea = document.getElementById("resultArea");
+    function showPersonAmount(code) {
+      const selected = document.getElementById("personSelect").value;
+      const amount = data[code].owed[selected]?.amount || 0;
+      const reason = data[code].owed[selected]?.reason || "No reason provided";
 
-    if (!data[code]) {
-      resultArea.innerHTML = `<p style="color:red;">Code not recognized.</p>`;
-      return;
+      document.getElementById("personAmount").textContent = `${selected} owes you: AED ${amount.toFixed(2)} (${reason})`;
     }
-
-    const person = data[code];
-    const personName = person.name;
-    const totalOwedToYou = Object.values(person.owed)
-      .reduce((sum, entry) => sum + entry.amount, 0);
-
-    const dropdownOptions = Object.entries(person.owed)
-      .filter(([name]) => name !== person.exclude)
-      .map(([name, entry]) => `<option value="${name}">${name}</option>`)
-      .join("");
-
-    // Checking what YOU OWE to others
-    let oweOthersHTML = "";
-    for (const [otherCode, otherPerson] of Object.entries(data)) {
-      if (otherCode === code) continue; // skip yourself
-
-      const owedFromYou = otherPerson.owed[personName];
-      if (owedFromYou && owedFromYou.amount > 0) {
-        oweOthersHTML += `<p><strong>${otherPerson.name}</strong> is owed by you: AED ${owedFromYou.amount.toFixed(2)}<br>
-        Reason: <em>${owedFromYou.reason}</em></p>`;
-      }
-    }
-    if (oweOthersHTML === "") {
-      oweOthersHTML = `<p>You don't owe anyone anything.</p>`;
-    }
-
-    resultArea.innerHTML = `
-      <p>Welcome <strong>${person.name}</strong>!</p>
-      <p>Total Owed to You: <span style="color: green;">AED ${totalOwedToYou.toFixed(2)}</span></p>
-
-      <div class="dropdown-section">
-        <label for="personSelect">Select person:</label>
-        <select id="personSelect" onchange="showPersonAmount('${code}')">
-          <option value="" disabled selected>Select</option>
-          ${dropdownOptions}
-        </select>
-        <div id="personAmount"></div>
-        <div id="reasonText"></div>
-      </div>
-
-      <div id="oweOthers">
-        <h3>What You Owe Others:</h3>
-        ${oweOthersHTML}
-      </div>
-    `;
-  }
-
-  function showPersonAmount(code) {
-    const selected = document.getElementById("personSelect").value;
-    const entry = data[code].owed[selected];
-    document.getElementById("personAmount").textContent = `${selected} owes you: AED ${entry.amount.toFixed(2)}`;
-    document.getElementById("reasonText").textContent = `Reason: ${entry.reason}`;
-  }
-</script>
+  </script>
 
 </body>
-</html> 
+</html>
