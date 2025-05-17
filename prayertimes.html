@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prayer Times Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to top, #004aad, #87cefa);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    #next-prayer {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 140px);
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .box {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    .box span {
+      display: block;
+      font-size: 22px;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Today's Prayer Times – 17 May, 19 Dhu al-Qadah</h2>
+    <div id="next-prayer">Next Prayer in --:--</div>
+    <div class="grid">
+      <div class="box">Fajr <span id="fajr-time">04:07</span></div>
+      <div class="box">Sunrise <span>05:30</span></div>
+      <div class="box">Dhuhr <span id="dhuhr-time">12:18</span></div>
+      <div class="box">Asr <span id="asr-time">15:42</span></div>
+      <div class="box">Maghrib <span id="maghrib-time">19:01</span></div>
+      <div class="box">Isha <span id="isha-time">20:24</span></div>
+    </div>
+  </div>
+
+  <audio id="adhan" src="adhan.mp3" preload="auto"></audio>
+
+  <script>
+    const prayerTimes = {
+      fajr: "04:07",
+      dhuhr: "12:18",
+      asr: "15:42",
+      maghrib: "19:01",
+      isha: "20:24"
+    };
+
+    const audio = document.getElementById("adhan");
+    let playedToday = {};
+
+    function checkPrayerTimes() {
+      const now = new Date();
+      const currentTime = now.getHours().toString().padStart(2, '0') + ":" +
+                          now.getMinutes().toString().padStart(2, '0');
+
+      for (const [prayer, time] of Object.entries(prayerTimes)) {
+        if (currentTime === time && !playedToday[prayer]) {
+          playedToday[prayer] = true;
+          audio.play();
+          alert(`It's time for ${prayer.toUpperCase()}!`);
+        }
+      }
+
+      updateNextPrayer(now);
+    }
+
+    function updateNextPrayer(now) {
+      let nextPrayer = null;
+      let minDiff = Infinity;
+
+      for (const [prayer, time] of Object.entries(prayerTimes)) {
+        const [h, m] = time.split(":").map(Number);
+        const prayerTime = new Date(now);
+        prayerTime.setHours(h, m, 0, 0);
+        const diff = prayerTime - now;
+
+        if (diff > 0 && diff < minDiff) {
+          minDiff = diff;
+          nextPrayer = { name: prayer, diff };
+        }
+      }
+
+      if (nextPrayer) {
+        const mins = Math.floor(nextPrayer.diff / 60000);
+        const secs = Math.floor((nextPrayer.diff % 60000) / 1000);
+        document.getElementById("next-prayer").textContent =
+          `Next Prayer: ${nextPrayer.name.toUpperCase()} in ${mins}m ${secs}s`;
+      } else {
+        document.getElementById("next-prayer").textContent = "No more prayers today.";
+      }
+    }
+
+    setInterval(checkPrayerTimes, 1000);
+    checkPrayerTimes();
+  </script>
+</body>
+</html>
