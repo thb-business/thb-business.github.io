@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Year 7 General Press</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      color: #222;
+      margin: 0;
+    }
+
+    /* Masthead */
+    header {
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    /* Nav Bar */
+    nav {
+      background: #333;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 12px;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Layout grid */
+    .container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    /* Featured Article */
+    .featured {
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .featured img {
+      width: 100%;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .featured h2 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    .featured p {
+      line-height: 1.6;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .card a {
+      text-decoration: none;
+      color: #0077cc;
+      font-weight: bold;
+    }
+
+    footer {
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Masthead -->
+  <header>
+    <h1>Year 7 General Press</h1>
+    <p id="date"></p>
+  </header>
+
+  <!-- Categories Nav -->
+  <nav>
+    <a href="/directory/animations">Animations</a>
+    <a href="/directory/articles">News</a>
+    <a href="/directory/art">Art</a>
+  </nav>
+
+  <!-- Layout -->
+  <div class="container">
+    <!-- Featured Article -->
+    <section class="featured">
+      <img src="https://via.placeholder.com/900x400" alt="Science Club">
+      <h2>Year 7 Students Launch New Science Club</h2>
+      <p>Students in Year 7 have officially launched their brand-new Science Club this week. The club, created by students and supported by teachers, aims to make science fun, hands-on, and exciting for everyone involved.</p>
+      <a href="/directory/articles#scienceclub">Read More →</a>
+    </section>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="card">
+        <h3>Sports Day 2025 Announced</h3>
+        <p>Get ready! Sports Day is coming next month with exciting new events for everyone.</p>
+        <a href="/directory/articles#sportsday">Read More</a>
+      </div>
+      <div class="card">
+        <h3>Art Competition Winners</h3>
+        <p>Year 7 and Year 8 students showcased their best work in this year’s art contest.</p>
+        <a href="/directory/art#competition">Read More</a>
+      </div>
+      <div class="card">
+        <h3>Animation Club Releases Short Film</h3>
+        <p>The Animation Club has dropped its first short film, and it’s already a hit among students.</p>
+        <a href="/directory/animations#shortfilm">Read More</a>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <p>© 2025 School Times | Powered by Year 7 Reporters</p>
+  </footer>
+
+  <script>
+    // Insert today’s date
+    document.getElementById("date").textContent = new Date().toDateString();
+  </script>
+</body>
+</html>
